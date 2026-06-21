@@ -1,10 +1,9 @@
 import os
+import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
-
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 tutors = [
     {"name": "Rajesh Kumar", "subject": "Maths", "location": "Velachery", 
@@ -18,6 +17,10 @@ tutors = [
     {"name": "Arun M.", "subject": "Maths", "location": "Tambaram", 
      "mode": "Online", "rate": 300, "experience": "2 years", "classes": "6th-10th"},
 ]
+
+def get_client():
+    api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+    return Groq(api_key=api_key)
 
 def find_matching_tutors(query):
     tutor_list = "\n".join([
@@ -42,6 +45,7 @@ Reply in this exact format for each tutor:
 3. [Tutor Name] - [Match %] - [Reason]
 """
 
+    client = get_client()
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
